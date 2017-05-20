@@ -15,18 +15,19 @@
 			<vue-timepicker v-model="startTime"
 					:minute-interval="5"
 					hide-clear-button></vue-timepicker>
-		</div>
-		<div>
-			End: 
-			<vue-timepicker v-model="endTime"
-					:minute-interval="5"
-					hide-clear-button></vue-timepicker>
+			<span class="pull-right">
+				End: 
+				<vue-timepicker v-model="endTime"
+						:minute-interval="5"
+						hide-clear-button></vue-timepicker>
+			</span>
 		</div>
 	</div>
 	<div slot="footer">
 		<button type="button" 
 				class="btn btn-default"
 				@click="$refs.editModal.close()">Cancel</button>
+
 		<button type="button" 
 				class="btn btn-primary"
 				@click="save">Save</button>
@@ -36,9 +37,11 @@
 </template>
 
 <script>
+import TPTime from './TPTime.js';
 import VueTimepicker from 'vue2-timepicker';
 import BootstrapModal from 'vue2-bootstrap-modal';
 import axios from 'axios'
+
 
 export default {
 	props: {
@@ -53,68 +56,89 @@ export default {
 			currentDate: {},
 			activity: {},
 			title: 'Add activity',
-			startTime: {
-				HH: 0,
-				mm: 0
-			},
-			endTime: {
-				HH: 0,
-				mm: 0
-			}
+			startTime: new TPTime(),
+			endTime: new TPTime()
 		}
 	},
 	methods: {
 		open(date) {
 			this.currentDate = date;
-			axios.get('/api/activity/'+this.id, {
-				params: {
-					api_token: window.api_token
-				}
-			})
-			.then(response => {
-				this.activity = response.data;
-				this.activity.start = new Date(this.activity.start);
-				this.activity.end = new Date(this.activity.end);
-				this.startTime = this.dateToDPTime(this.activity.start);
-				this.endTime = this.dateToDPTime(this.activity.end);
+			if (this.id) {
+				axios.get('/api/activity/'+this.id, {
+					params: {
+						api_token: window.api_token
+					}
+				})
+				.then(response => {
+					this.activity = response.data;
+					this.activity.start = new Date(this.activity.start);
+					this.activity.end = new Date(this.activity.end);
+					this.startTime = TPTime.dateToDPTime(this.activity.start);
+					this.endTime = TPTime.dateToDPTime(this.activity.end);
 
+
+					this.$refs.editModal.open();
+				});
+			} else {
+				this.activity = {};
+				this.startTime = new TPTime();
+				this.endTime = new TPTime();
 
 				this.$refs.editModal.open();
-			});
+			}
 		},
 		save() {
-			let startDT = new Date(this.currentDate.getTime());
-			startDT.setTime(startDT.getTime() + (this.startTime.HH*60 + parseInt(this.startTime.mm))*60*1000); 
+			this.startTime = new TPTime(this.startTime);
+			let startDT = this.startTime.toDate(this.currentDate);
 
-			let endDT = new Date(this.currentDate.getTime());
-			endDT.setTime(endDT.getTime() + (this.endTime.HH*60 + parseInt(this.endTime.mm))*60*1000); 
+			// console.log(Object.create(TPTime, this.startTime));
+
+			// let startDT = new Date(this.currentDate.getTime());
+			// startDT.setTime(startDT.getTime() + (this.startTime.HH*60 + parseInt(this.startTime.mm))*60*1000); 
+
+			this.endTime = new TPTime(this.endTime);
+			let endDT = this.endTime.toDate(this.currentDate);
+			// let endDT = new Date(this.currentDate.getTime());
+			// endDT.setTime(endDT.getTime() + (this.endTime.HH*60 + parseInt(this.endTime.mm))*60*1000); 
 
 			if (endDT < startDT) {
 				endDT.setTime(endDT.getTime() + 24*60*60*1000);
 			}
 
-			axios.put('/api/activity/'+this.id, {
+			let result = {
 				name: this.activity.name,
 				start: startDT.toString(),
 				end: endDT.toString(),
 				api_token: window.api_token
-			})
-			.then(response => {
-				this.activity = response.data;
-				this.$emit('save', this.activity);
-			});
-			this.$refs.editModal.close();
-		},
-		DPTimeToDate(datepickerTime) {
+			};
 
-		},
-		dateToDPTime(date) {
-			return {
-				HH: ''+date.getHours(),
-				mm: ''+date.getMinutes()
+			let path = '/api/activity';
+			if (this.id) {
+				path += '/' + this.id;
+				axios.put(path, result).then(response => {
+					this.activity = response.data;
+					this.activity.start = new Date(this.activity.start);
+					this.activity.end = new Date(this.activity.end);
+
+					this.$emit('save', this.activity);
+				});
+			} else {
+				// console.log('ololo');
+				axios.post(path, result).then(response => {
+					this.activity = response.data;
+					this.activity.start = new Date(this.activity.start);
+					this.activity.end = new Date(this.activity.end);
+
+					this.$emit('save', this.activity);
+				});
 			}
-		}
 
+			// axios.put(path, result).then(response => {
+			// 	this.activity = response.data;
+			// 	this.$emit('save', this.activity);
+			// });
+			this.$refs.editModal.close();
+		}
 	}
 }
 

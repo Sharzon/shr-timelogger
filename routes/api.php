@@ -19,9 +19,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => 'auth:api'], function () {
     // Route::get('/activity', 'ActivityController@')
+    Route::post('activity', 'ActivityController@store');
     Route::get('activity', 'ActivityController@index');
     Route::get('activity/{id}', 'ActivityController@show')
         ->where('id', '[0-9]+');
     Route::put('activity/{id}', 'ActivityController@update')
         ->where('id', '[0-9]+');
+    Route::delete('activity/{id}', 'ActivityController@destroy')
+        ->where('id', '[0-9]+');
+
 });

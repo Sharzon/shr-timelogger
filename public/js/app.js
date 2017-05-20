@@ -2256,6 +2256,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_axios__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModalActivity_vue__ = __webpack_require__(79);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ModalActivity_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__ModalActivity_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__TPTime_js__ = __webpack_require__(102);
 //
 //
 //
@@ -2275,6 +2276,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -2283,14 +2299,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 	data: function data() {
 		return {
 			activities: [],
-			modalId: 0,
+			modalId: null,
 			currentDate: {}
 		};
 	},
 
 	components: {
 		axios: __WEBPACK_IMPORTED_MODULE_0_axios___default.a,
-		ModalActivity: __WEBPACK_IMPORTED_MODULE_1__ModalActivity_vue___default.a
+		ModalActivity: __WEBPACK_IMPORTED_MODULE_1__ModalActivity_vue___default.a,
+		TPTime: __WEBPACK_IMPORTED_MODULE_2__TPTime_js__["a" /* default */]
 	},
 	methods: {
 		loadActivities: function loadActivities(date) {
@@ -2303,23 +2320,76 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					api_token: window.api_token
 				}
 			}).then(function (response) {
-				return _this.activities = response.data;
+				_this.activities = response.data;
+				_this.activities.forEach(function (activity, i, arr) {
+					activity.start = new Date(activity.start);
+					activity.startStr = __WEBPACK_IMPORTED_MODULE_2__TPTime_js__["a" /* default */].dateToDPTime(activity.start).toString();
+					activity.end = new Date(activity.end);
+					activity.endStr = __WEBPACK_IMPORTED_MODULE_2__TPTime_js__["a" /* default */].dateToDPTime(activity.end).toString();
+				});
 			});
 		},
-		openNewModal: function openNewModal() {},
-		openEditModal: function openEditModal(id) {
+		openNewModal: function openNewModal() {
 			var _this2 = this;
 
-			this.modalId = id;
+			this.modalId = null;
 			Vue.nextTick(function () {
 				return _this2.$refs.modal.open(_this2.currentDate);
 			});
 		},
+		openEditModal: function openEditModal(id) {
+			var _this3 = this;
+
+			this.modalId = id;
+			Vue.nextTick(function () {
+				return _this3.$refs.modal.open(_this3.currentDate);
+			});
+		},
 		updateActivity: function updateActivity(activity) {
-			this.activities.forEach(function (curActivity, i, arr) {
-				if (activity.id == curActivity.id) {
-					Vue.set(arr, i, activity);
+			activity.startStr = __WEBPACK_IMPORTED_MODULE_2__TPTime_js__["a" /* default */].dateToDPTime(activity.start).toString();
+			activity.endStr = __WEBPACK_IMPORTED_MODULE_2__TPTime_js__["a" /* default */].dateToDPTime(activity.end).toString();
+
+			var removableIndex = this.activities.length;
+			for (var i = 0; i < this.activities.length; i++) {
+				if (activity.id == this.activities[i].id) {
+					removableIndex = i;
+					break;
 				}
+			}
+			this.activities.splice(removableIndex, 1);
+
+			var insertableIndex = this.activities.length;
+			for (var _i = 0; _i < this.activities.length; _i++) {
+				if (activity.start < this.activities[_i].start) {
+					insertableIndex = _i;
+					break;
+				}
+			}
+			this.activities.splice(insertableIndex, 0, activity);
+
+			// this.activities.forEach((curActivity, i, arr) => {
+			// 	if (activity.id == curActivity.id) {
+			// 		Vue.set(arr, i, activity);
+			// 	}
+			// });
+		},
+		deleteActivity: function deleteActivity(id) {
+			var _this4 = this;
+
+			__WEBPACK_IMPORTED_MODULE_0_axios___default.a.delete('/api/activity/' + id, {
+				params: {
+					api_token: window.api_token
+				}
+			}).then(function (response) {
+				var removableIndex = _this4.activities.length;
+				for (var i = 0; i < _this4.activities.length; i++) {
+					if (id == _this4.activities[i].id) {
+						removableIndex = i;
+						break;
+					}
+				}
+
+				_this4.activities.splice(removableIndex, 1);
 			});
 		}
 	},
@@ -2332,12 +2402,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue2_timepicker__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue2_timepicker___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue2_timepicker__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue2_bootstrap_modal__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue2_bootstrap_modal___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue2_bootstrap_modal__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_axios__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_axios__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TPTime_js__ = __webpack_require__(102);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue2_timepicker__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue2_timepicker___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue2_timepicker__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue2_bootstrap_modal__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue2_bootstrap_modal___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue2_bootstrap_modal__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_axios__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_axios__);
 //
 //
 //
@@ -2375,6 +2446,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+
 
 
 
@@ -2385,22 +2458,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		id: Number
 	},
 	components: {
-		BootstrapModal: __WEBPACK_IMPORTED_MODULE_1_vue2_bootstrap_modal___default.a,
-		VueTimepicker: __WEBPACK_IMPORTED_MODULE_0_vue2_timepicker___default.a
+		BootstrapModal: __WEBPACK_IMPORTED_MODULE_2_vue2_bootstrap_modal___default.a,
+		VueTimepicker: __WEBPACK_IMPORTED_MODULE_1_vue2_timepicker___default.a
 	},
 	data: function data() {
 		return {
 			currentDate: {},
 			activity: {},
 			title: 'Add activity',
-			startTime: {
-				HH: 0,
-				mm: 0
-			},
-			endTime: {
-				HH: 0,
-				mm: 0
-			}
+			startTime: new __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */](),
+			endTime: new __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */]()
 		};
 	},
 
@@ -2409,50 +2476,81 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var _this = this;
 
 			this.currentDate = date;
-			__WEBPACK_IMPORTED_MODULE_2_axios___default.a.get('/api/activity/' + this.id, {
-				params: {
-					api_token: window.api_token
-				}
-			}).then(function (response) {
-				_this.activity = response.data;
-				_this.activity.start = new Date(_this.activity.start);
-				_this.activity.end = new Date(_this.activity.end);
-				_this.startTime = _this.dateToDPTime(_this.activity.start);
-				_this.endTime = _this.dateToDPTime(_this.activity.end);
+			if (this.id) {
+				__WEBPACK_IMPORTED_MODULE_3_axios___default.a.get('/api/activity/' + this.id, {
+					params: {
+						api_token: window.api_token
+					}
+				}).then(function (response) {
+					_this.activity = response.data;
+					_this.activity.start = new Date(_this.activity.start);
+					_this.activity.end = new Date(_this.activity.end);
+					_this.startTime = __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */].dateToDPTime(_this.activity.start);
+					_this.endTime = __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */].dateToDPTime(_this.activity.end);
 
-				_this.$refs.editModal.open();
-			});
+					_this.$refs.editModal.open();
+				});
+			} else {
+				this.activity = {};
+				this.startTime = new __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */]();
+				this.endTime = new __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */]();
+
+				this.$refs.editModal.open();
+			}
 		},
 		save: function save() {
 			var _this2 = this;
 
-			var startDT = new Date(this.currentDate.getTime());
-			startDT.setTime(startDT.getTime() + (this.startTime.HH * 60 + parseInt(this.startTime.mm)) * 60 * 1000);
+			this.startTime = new __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */](this.startTime);
+			var startDT = this.startTime.toDate(this.currentDate);
 
-			var endDT = new Date(this.currentDate.getTime());
-			endDT.setTime(endDT.getTime() + (this.endTime.HH * 60 + parseInt(this.endTime.mm)) * 60 * 1000);
+			// console.log(Object.create(TPTime, this.startTime));
+
+			// let startDT = new Date(this.currentDate.getTime());
+			// startDT.setTime(startDT.getTime() + (this.startTime.HH*60 + parseInt(this.startTime.mm))*60*1000); 
+
+			this.endTime = new __WEBPACK_IMPORTED_MODULE_0__TPTime_js__["a" /* default */](this.endTime);
+			var endDT = this.endTime.toDate(this.currentDate);
+			// let endDT = new Date(this.currentDate.getTime());
+			// endDT.setTime(endDT.getTime() + (this.endTime.HH*60 + parseInt(this.endTime.mm))*60*1000); 
 
 			if (endDT < startDT) {
 				endDT.setTime(endDT.getTime() + 24 * 60 * 60 * 1000);
 			}
 
-			__WEBPACK_IMPORTED_MODULE_2_axios___default.a.put('/api/activity/' + this.id, {
+			var result = {
 				name: this.activity.name,
 				start: startDT.toString(),
 				end: endDT.toString(),
 				api_token: window.api_token
-			}).then(function (response) {
-				_this2.activity = response.data;
-				_this2.$emit('save', _this2.activity);
-			});
-			this.$refs.editModal.close();
-		},
-		DPTimeToDate: function DPTimeToDate(datepickerTime) {},
-		dateToDPTime: function dateToDPTime(date) {
-			return {
-				HH: '' + date.getHours(),
-				mm: '' + date.getMinutes()
 			};
+
+			var path = '/api/activity';
+			if (this.id) {
+				path += '/' + this.id;
+				__WEBPACK_IMPORTED_MODULE_3_axios___default.a.put(path, result).then(function (response) {
+					_this2.activity = response.data;
+					_this2.activity.start = new Date(_this2.activity.start);
+					_this2.activity.end = new Date(_this2.activity.end);
+
+					_this2.$emit('save', _this2.activity);
+				});
+			} else {
+				// console.log('ololo');
+				__WEBPACK_IMPORTED_MODULE_3_axios___default.a.post(path, result).then(function (response) {
+					_this2.activity = response.data;
+					_this2.activity.start = new Date(_this2.activity.start);
+					_this2.activity.end = new Date(_this2.activity.end);
+
+					_this2.$emit('save', _this2.activity);
+				});
+			}
+
+			// axios.put(path, result).then(response => {
+			// 	this.activity = response.data;
+			// 	this.$emit('save', this.activity);
+			// });
+			this.$refs.editModal.close();
 		}
 	}
 });
@@ -32911,6 +33009,10 @@ module.exports = Component.exports
 /* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
+/* styles */
+__webpack_require__(100)
+
 var Component = __webpack_require__(8)(
   /* script */
   __webpack_require__(39),
@@ -33027,7 +33129,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       expression: "startTime"
     }
-  })], 1), _vm._v(" "), _c('div', [_vm._v("\n\t\t\tEnd: \n\t\t\t"), _c('vue-timepicker', {
+  }), _vm._v(" "), _c('span', {
+    staticClass: "pull-right"
+  }, [_vm._v("\n\t\t\t\tEnd: \n\t\t\t\t"), _c('vue-timepicker', {
     attrs: {
       "minute-interval": 5,
       "hide-clear-button": ""
@@ -33039,7 +33143,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       expression: "endTime"
     }
-  })], 1)]), _vm._v(" "), _c('div', {
+  })], 1)], 1)]), _vm._v(" "), _c('div', {
     slot: "footer"
   }, [_c('button', {
     staticClass: "btn btn-default",
@@ -33082,20 +33186,32 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.openNewModal
     }
-  }, [_vm._v("Add activity")]), _vm._v(" "), (_vm.activities.length > 0) ? _c('div', {
-    staticClass: "list-group"
-  }, _vm._l((_vm.activities), function(activity) {
-    return _c('a', {
-      staticClass: "list-group-item",
+  }, [_vm._v("Add activity")]), _vm._v(" "), (_vm.activities.length > 0) ? _c('div', _vm._l((_vm.activities), function(activity) {
+    return _c('div', [_c('button', {
+      staticClass: "btn btn-primary edit-activity",
       attrs: {
-        "href": "#"
+        "type": "button"
       },
       on: {
         "click": function($event) {
           _vm.openEditModal(activity.id)
         }
       }
-    }, [_vm._v(_vm._s(activity.name))])
+    }, [_c('span', {
+      staticClass: "pull-left"
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(activity.startStr) + "\n\t\t\t\t")]), _vm._v("\n\t\t\t\t" + _vm._s(activity.name) + "\n\t\t\t\t"), _c('span', {
+      staticClass: "pull-right"
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(activity.endStr) + "\n\t\t\t\t")])]), _vm._v(" "), _c('button', {
+      staticClass: "pull-right btn btn-danger del-activity",
+      attrs: {
+        "type": "button"
+      },
+      on: {
+        "click": function($event) {
+          _vm.deleteActivity(activity.id)
+        }
+      }
+    }, [_vm._v("Delete")])])
   })) : _vm._e(), _vm._v(" "), _c('modal-activity', {
     ref: "modal",
     attrs: {
@@ -43924,6 +44040,108 @@ module.exports = function(module) {
 __webpack_require__(19);
 module.exports = __webpack_require__(20);
 
+
+/***/ }),
+/* 92 */,
+/* 93 */,
+/* 94 */,
+/* 95 */,
+/* 96 */,
+/* 97 */,
+/* 98 */,
+/* 99 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(17)();
+exports.push([module.i, "\n.edit-activity {\n\twidth: 85%;\n}\n.del-activity {\n\twidth: 15%;\n}\n", ""]);
+
+/***/ }),
+/* 100 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(99);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(84)("62f4f2f4", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-6030412e\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Activities.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-6030412e\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Activities.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 101 */,
+/* 102 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TPTime = function () {
+  function TPTime(hours, minutes) {
+    _classCallCheck(this, TPTime);
+
+    if (arguments.length == 1) {
+      this.HH = arguments[0].HH;
+      this.mm = arguments[0].mm;
+    } else if (hours !== undefined && minutes !== undefined) {
+      this.HH = TPTime.numTo00Format(hours);
+      this.mm = TPTime.numTo00Format(minutes);
+    } else {
+      this.HH = "00";
+      this.mm = "00";
+    }
+  }
+
+  _createClass(TPTime, [{
+    key: "toDate",
+    value: function toDate(startingDate) {
+      var date = new Date(startingDate.getTime());
+      date.setHours(parseInt(this.HH));
+      date.setMinutes(parseInt(this.mm));
+
+      return date;
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      return TPTime.numTo00Format(this.HH) + ':' + TPTime.numTo00Format(this.mm);
+    }
+  }], [{
+    key: "numTo00Format",
+    value: function numTo00Format(num) {
+      var str = '' + num;
+      if (str.length == 1) {
+        str = '0' + str;
+      }
+
+      return str;
+    }
+  }, {
+    key: "dateToDPTime",
+    value: function dateToDPTime(date) {
+      return new TPTime(date.getHours(), date.getMinutes());
+    }
+  }]);
+
+  return TPTime;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (TPTime);
 
 /***/ })
 /******/ ]);

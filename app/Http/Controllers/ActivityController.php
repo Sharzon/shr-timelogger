@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $this->validate($request, [
             'date' => 'date'
         ]);
@@ -18,7 +17,29 @@ class ActivityController extends Controller
 
         // dd($date);
 
-        return response()->json(Activity::whereDate('start', $date)->get());
+        return response()->json(
+            Activity::whereDate('start', $date)
+            ->orderBy('start')
+            ->get()
+        );
+    }
+
+    public function store(Request $request) {
+        $this->validate($request, [
+            'name' => 'required',
+            'start' => 'date|required',
+            'end' => 'date|required',
+        ]);
+
+        $activity = Activity::create([
+            'name' => $request->name,
+            'start' => Carbon::parse($request->start),
+            'end' => Carbon::parse($request->end),
+        ]);
+
+        $activity = Activity::find($activity->id);
+
+        return response()->json($activity);
     }
 
     public function show(Request $request, $id) {
@@ -40,5 +61,9 @@ class ActivityController extends Controller
         $activity = Activity::find($activity->id);
 
         return response()->json($activity);
+    }
+
+    public function destroy(Request $request, $id) {
+        Activity::destroy($id);
     }
 }
