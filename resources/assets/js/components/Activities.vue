@@ -12,12 +12,11 @@
 						{{ activity.startStr }}
 					</span>
 					{{ activity.name }}
+
 					<span class="pull-right">
 						{{ activity.endStr }}
 					</span>
 				</button>
-				<!-- </div> -->
-				<!-- <div class="btn-group" role="group"> -->
 				<button type="button" 
 						class="pull-right btn btn-danger del-activity"
 						@click="deleteActivity(activity.id)">Delete</button>

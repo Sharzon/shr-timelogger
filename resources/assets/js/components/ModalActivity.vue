@@ -15,12 +15,15 @@
 			<vue-timepicker v-model="startTime"
 					:minute-interval="5"
 					hide-clear-button></vue-timepicker>
+			<button class="btn btn-primary" @click="curMoment('startTime')">Currently</button>
 			<span class="pull-right">
 				End: 
 				<vue-timepicker v-model="endTime"
 						:minute-interval="5"
 						hide-clear-button></vue-timepicker>
+				<button class="btn btn-primary" @click="curMoment('endTime')">Currently</button>
 			</span>
+
 		</div>
 	</div>
 	<div slot="footer">
@@ -138,6 +141,10 @@ export default {
 			// 	this.$emit('save', this.activity);
 			// });
 			this.$refs.editModal.close();
+		},
+
+		curMoment(tpTime) {
+			this[tpTime] = TPTime.dateToDPTime(new Date());
 		}
 	}
 }
