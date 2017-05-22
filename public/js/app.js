@@ -2571,6 +2571,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 
@@ -33507,9 +33509,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }, [_c('span', {
       staticClass: "pull-left"
-    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(activity.startStr) + "\n\t\t\t\t")]), _vm._v("\n\t\t\t\t" + _vm._s(activity.name) + "\n\n\t\t\t\t"), _c('span', {
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(activity.startStr) + "\n\t\t\t\t")]), _vm._v(" "), _c('span', {
       staticClass: "pull-right"
-    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(activity.endStr) + "\n\t\t\t\t")])]), _vm._v(" "), _c('button', {
+    }, [_vm._v("\n\t\t\t\t\t" + _vm._s(activity.endStr) + "\n\t\t\t\t")]), _vm._v("\n\t\t\t\t" + _vm._s(activity.name) + "\n\t\t\t")]), _vm._v(" "), _c('button', {
       staticClass: "pull-right btn btn-danger del-activity",
       attrs: {
         "type": "button"

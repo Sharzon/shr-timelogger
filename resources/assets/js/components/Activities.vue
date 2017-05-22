@@ -8,14 +8,16 @@
 				<button type="button"
 						@click="openEditModal(activity.id)"
 						class="btn btn-primary edit-activity">
+
 					<span class="pull-left">
 						{{ activity.startStr }}
 					</span>
-					{{ activity.name }}
+					
 
 					<span class="pull-right">
 						{{ activity.endStr }}
 					</span>
+					{{ activity.name }}
 				</button>
 				<button type="button" 
 						class="pull-right btn btn-danger del-activity"
